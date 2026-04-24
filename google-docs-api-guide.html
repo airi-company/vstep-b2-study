@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Google Docs API Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: rgba(17, 24, 39, 0.82);
+      --card: rgba(255,255,255,0.05);
+      --line: rgba(255,255,255,0.08);
+      --text: #f9fafb;
+      --muted: #9ca3af;
+      --primary: #60a5fa;
+      --accent: #a78bfa;
+      --success: #34d399;
+      --warn: #fbbf24;
+      --shadow: 0 20px 60px rgba(0,0,0,.3);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(96,165,250,.18), transparent 28%),
+        radial-gradient(circle at top right, rgba(167,139,250,.16), transparent 24%),
+        linear-gradient(180deg, #0b1020 0%, #111827 100%);
+      min-height: 100vh;
+    }
+    .container { width: min(1120px, calc(100% - 32px)); margin: 0 auto; }
+    .nav {
+      position: sticky; top: 0; z-index: 20;
+      backdrop-filter: blur(12px);
+      background: rgba(11, 16, 32, .7);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .nav-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 0;
+    }
+    .brand { font-weight: 800; }
+    .brand span { color: var(--primary); }
+    .nav-links a {
+      color: var(--muted); text-decoration: none; margin-left: 16px; font-size: 14px;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .hero {
+      padding: 72px 0 36px;
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 24px;
+      align-items: start;
+    }
+    .badge {
+      display: inline-block;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(96,165,250,.25);
+      background: rgba(96,165,250,.1);
+      color: #bfdbfe;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 18px;
+    }
+    h1 {
+      margin: 0 0 14px;
+      font-size: clamp(34px, 6vw, 58px);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+    }
+    .lead {
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.8;
+      max-width: 700px;
+      margin-bottom: 22px;
+    }
+    .cta { display: flex; gap: 12px; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 14px 18px; border-radius: 14px; text-decoration: none; font-weight: 600;
+      transition: .2s ease;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: white; box-shadow: var(--shadow);
+    }
+    .btn-secondary {
+      color: var(--text);
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--line);
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .hero-card, .card, .code-block, .summary {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+    }
+    .hero-card { padding: 22px; }
+    .hero-card h3 { margin-top: 0; }
+    .meta { display: grid; gap: 12px; margin-top: 16px; }
+    .meta-item {
+      display: flex; justify-content: space-between; gap: 12px;
+      color: var(--muted); font-size: 14px;
+      padding-bottom: 10px; border-bottom: 1px dashed rgba(255,255,255,.08);
+    }
+    .meta-item strong { color: var(--text); }
+    section { padding: 18px 0; }
+    .section-title {
+      margin: 0 0 12px;
+      font-size: 28px;
+      letter-spacing: -0.02em;
+    }
+    .section-desc {
+      color: var(--muted); margin: 0 0 18px; line-height: 1.8;
+    }
+    .grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px;
+    }
+    .card { padding: 22px; }
+    .card h3 { margin-top: 0; margin-bottom: 10px; }
+    .card p, .card li { color: var(--muted); line-height: 1.8; }
+    .card ul { margin: 0; padding-left: 18px; }
+    .timeline {
+      display: grid; gap: 16px;
+    }
+    .step {
+      display: grid; grid-template-columns: 56px 1fr; gap: 16px;
+      align-items: start;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+    }
+    .step-number {
+      width: 56px; height: 56px; border-radius: 16px;
+      display: grid; place-items: center; font-weight: 800;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: white;
+    }
+    .step h3 { margin: 0 0 8px; }
+    .step p { margin: 0; color: var(--muted); line-height: 1.8; }
+    .code-block {
+      padding: 20px;
+      overflow: auto;
+      margin-top: 16px;
+      background: rgba(2, 6, 23, .82);
+    }
+    pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      color: #dbeafe;
+      font-size: 14px;
+      line-height: 1.7;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+    .summary {
+      padding: 26px;
+      margin: 28px 0 42px;
+    }
+    .summary ul { padding-left: 20px; color: var(--muted); line-height: 1.8; }
+    .pill-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+    .pill {
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.08);
+      color: #dbeafe;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .note {
+      margin-top: 12px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      background: rgba(251,191,36,.08);
+      border: 1px solid rgba(251,191,36,.18);
+      color: #fde68a;
+      line-height: 1.7;
+      font-size: 14px;
+    }
+    footer {
+      color: var(--muted);
+      text-align: center;
+      padding: 10px 0 34px;
+      font-size: 14px;
+    }
+    @media (max-width: 920px) {
+      .hero, .grid { grid-template-columns: 1fr; }
+      .nav-inner { gap: 12px; flex-direction: column; align-items: flex-start; }
+      .nav-links a { margin-left: 0; margin-right: 12px; display: inline-block; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="container nav-inner">
+      <div class="brand">Google <span>Docs API</span> Guide</div>
+      <div class="nav-links">
+        <a href="#tong-quan">Tổng quan</a>
+        <a href="#cac-buoc">Các bước</a>
+        <a href="#api">API</a>
+        <a href="#mau-code">Mẫu code</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container">
+    <section class="hero" id="tong-quan">
+      <div>
+        <div class="badge">OAuth 2.0 • Google Docs API • Google Drive API</div>
+        <h1>Cách kết nối và chỉnh sửa Google Docs bằng API</h1>
+        <p class="lead">
+          Nếu muốn một ứng dụng hoặc trợ lý AI ghi nội dung trực tiếp vào Google Docs, bạn sẽ cần dùng
+          <strong>Google Cloud Project</strong>, bật <strong>Google Docs API + Google Drive API</strong>,
+          sau đó xác thực bằng <strong>OAuth 2.0</strong> để lấy access token và refresh token.
+        </p>
+        <div class="cta">
+          <a class="btn btn-primary" href="#cac-buoc">Xem từng bước</a>
+          <a class="btn btn-secondary" href="#mau-code">Xem ví dụ request</a>
+        </div>
+        <div class="pill-row">
+          <span class="pill">Google Cloud Console</span>
+          <span class="pill">OAuth Consent Screen</span>
+          <span class="pill">Client ID / Secret</span>
+          <span class="pill">Access Token</span>
+          <span class="pill">Refresh Token</span>
+        </div>
+      </div>
+
+      <aside class="hero-card">
+        <h3>Những thứ bắt buộc</h3>
+        <div class="meta">
+          <div class="meta-item"><span>Cloud Project</span><strong>Có</strong></div>
+          <div class="meta-item"><span>Google Docs API</span><strong>Bật</strong></div>
+          <div class="meta-item"><span>Google Drive API</span><strong>Bật</strong></div>
+          <div class="meta-item"><span>OAuth 2.0</span><strong>Bắt buộc</strong></div>
+          <div class="meta-item"><span>API Key đơn lẻ</span><strong>Không đủ</strong></div>
+        </div>
+        <div class="note">
+          Google Docs cá nhân không thể sửa bằng một API key đơn giản. Muốn ghi nội dung, app phải được người dùng đăng nhập Google và cho phép quyền truy cập.
+        </div>
+      </aside>
+    </section>
+
+    <section>
+      <h2 class="section-title">Tổng quan hệ thống</h2>
+      <p class="section-desc">
+        Về bản chất, app của bạn sẽ xin quyền từ tài khoản Google, lấy token, rồi dùng token đó gọi API để đọc hoặc cập nhật tài liệu.
+      </p>
+      <div class="grid">
+        <div class="card">
+          <h3>Google Docs API</h3>
+          <p>Dùng để đọc cấu trúc tài liệu, chèn văn bản, replace nội dung, format heading, table và cập nhật nội dung qua <code>batchUpdate</code>.</p>
+        </div>
+        <div class="card">
+          <h3>Google Drive API</h3>
+          <p>Dùng để tìm file, đọc metadata, tạo file mới, quản lý quyền truy cập và hỗ trợ thao tác quanh tài liệu Google Docs.</p>
+        </div>
+        <div class="card">
+          <h3>OAuth 2.0</h3>
+          <p>Đây là lớp xác thực bắt buộc. Người dùng đăng nhập Google, bấm Allow, rồi app lấy access token và refresh token để gọi API hợp lệ.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="cac-buoc">
+      <h2 class="section-title">Các bước thiết lập</h2>
+      <p class="section-desc">Làm theo thứ tự này là ổn nhất nếu bạn muốn sau này để agent hoặc app nội bộ ghi Google Docs tự động.</p>
+      <div class="timeline">
+        <div class="step">
+          <div class="step-number">1</div>
+          <div>
+            <h3>Tạo Google Cloud Project</h3>
+            <p>Vào Google Cloud Console, tạo một project mới để gom toàn bộ cấu hình API, OAuth và quota vào cùng một nơi.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number">2</div>
+          <div>
+            <h3>Bật Google Docs API và Google Drive API</h3>
+            <p>Bạn cần bật cả hai. Docs API để sửa nội dung; Drive API để xử lý file, metadata và quyền truy cập.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number">3</div>
+          <div>
+            <h3>Tạo OAuth Consent Screen</h3>
+            <p>Nhập tên ứng dụng, email hỗ trợ, thêm scope cần dùng và cấu hình màn hình xin quyền từ Google.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number">4</div>
+          <div>
+            <h3>Tạo OAuth Client ID</h3>
+            <p>Chọn loại ứng dụng phù hợp: <strong>Desktop App</strong> nếu chạy local, hoặc <strong>Web App</strong> nếu có callback URL.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number">5</div>
+          <div>
+            <h3>Người dùng đăng nhập và bấm Allow</h3>
+            <p>Ứng dụng mở trình duyệt, người dùng đăng nhập Google, sau đó cấp quyền để app nhận access token và refresh token.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number">6</div>
+          <div>
+            <h3>Dùng token để gọi API</h3>
+            <p>Access token dùng để gọi Docs API / Drive API. Refresh token dùng để xin access token mới khi token cũ hết hạn.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="api">
+      <h2 class="section-title">Scope và endpoint quan trọng</h2>
+      <p class="section-desc">Bạn không cần xin quyền quá rộng nếu nhu cầu chỉ là đọc/sửa docs.</p>
+      <div class="grid">
+        <div class="card">
+          <h3>Scope nên dùng</h3>
+          <ul>
+            <li><code>https://www.googleapis.com/auth/documents</code></li>
+            <li><code>https://www.googleapis.com/auth/drive.file</code></li>
+            <li>Nếu cần mạnh hơn: <code>https://www.googleapis.com/auth/drive</code></li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Đọc tài liệu</h3>
+          <p><code>GET https://docs.googleapis.com/v1/documents/{documentId}</code></p>
+          <p>Dùng để lấy cấu trúc document, nội dung text và vị trí index.</p>
+        </div>
+        <div class="card">
+          <h3>Cập nhật tài liệu</h3>
+          <p><code>POST https://docs.googleapis.com/v1/documents/{documentId}:batchUpdate</code></p>
+          <p>Dùng để insert text, replace text, format paragraph, heading, list, table...</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="mau-code">
+      <h2 class="section-title">Ví dụ request để chèn text vào Google Docs</h2>
+      <p class="section-desc">Đây là dạng body phổ biến nhất khi bạn muốn thêm nội dung mới vào đầu tài liệu.</p>
+      <div class="code-block">
+        <pre>{
+  "requests": [
+    {
+      "insertText": {
+        "location": {
+          "index": 1
+        },
+        "text": "Hello Ngọc Tiến"
+      }
+    }
+  ]
+}</pre>
+      </div>
+
+      <div class="code-block">
+        <pre>POST https://docs.googleapis.com/v1/documents/{documentId}:batchUpdate
+Authorization: Bearer ACCESS_TOKEN
+Content-Type: application/json</pre>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="section-title">Nếu muốn assistant tự ghi Docs lâu dài</h2>
+      <p class="section-desc">Có 2 hướng phổ biến và thực tế nhất.</p>
+      <div class="grid">
+        <div class="card">
+          <h3>Hướng A — Viết bridge nội bộ</h3>
+          <p>Dùng Node.js hoặc Python để login OAuth 1 lần, lưu refresh token an toàn, sau đó tạo một API nội bộ để append/replace text trong docs.</p>
+        </div>
+        <div class="card">
+          <h3>Hướng B — Dùng MCP / connector</h3>
+          <p>Nếu hệ thống trợ lý hỗ trợ tool/connector, bạn có thể tạo một Google Docs connector với các lệnh như read_doc, append_doc, replace_text.</p>
+        </div>
+        <div class="card">
+          <h3>Hướng C — Chạy script cục bộ</h3>
+          <p>Đơn giản nhất để thử nhanh: tạo OAuth app, lấy token, rồi viết script append nội dung vào một document cụ thể.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="summary">
+      <h2 class="section-title">Tóm tắt ngắn</h2>
+      <ul>
+        <li>Google Docs cá nhân không thể sửa chỉ bằng API key đơn lẻ.</li>
+        <li>Bạn cần Google Cloud Project + Google Docs API + Google Drive API.</li>
+        <li>Xác thực bắt buộc là OAuth 2.0.</li>
+        <li>Sau khi người dùng bấm Allow, ứng dụng lấy access token / refresh token.</li>
+        <li>Dùng <code>batchUpdate</code> của Docs API để chèn hoặc sửa nội dung.</li>
+      </ul>
+      <div class="note">
+        Nếu muốn, bước tiếp theo mình có thể làm cho bạn là viết luôn một <strong>script Node.js</strong> để đăng nhập Google và tự động ghi nội dung vào một Google Docs cụ thể.
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    © 2026 • Google Docs API Guide • Soạn cho Ngọc Tiến
+  </footer>
+</body>
+</html>

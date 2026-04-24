@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VSTEP B2 Study Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #07111f;
+      --panel: rgba(15, 23, 42, 0.82);
+      --card: rgba(255,255,255,0.05);
+      --line: rgba(255,255,255,0.08);
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --primary: #38bdf8;
+      --accent: #8b5cf6;
+      --success: #34d399;
+      --warn: #fbbf24;
+      --shadow: 0 24px 80px rgba(0,0,0,.32);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(56,189,248,.18), transparent 26%),
+        radial-gradient(circle at top right, rgba(139,92,246,.16), transparent 24%),
+        linear-gradient(180deg, #07111f 0%, #0f172a 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    body::before, body::after {
+      content: "";
+      position: fixed;
+      width: 380px;
+      height: 380px;
+      border-radius: 999px;
+      filter: blur(90px);
+      opacity: .16;
+      z-index: -1;
+      animation: floatGlow 12s ease-in-out infinite;
+    }
+    body::before { background: #38bdf8; top: -90px; left: -80px; }
+    body::after { background: #8b5cf6; right: -100px; top: 220px; animation-delay: -5s; }
+
+    .container { width: min(1180px, calc(100% - 32px)); margin: 0 auto; }
+
+    .nav {
+      position: sticky; top: 0; z-index: 20;
+      backdrop-filter: blur(12px);
+      background: rgba(7,17,31,.72);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .nav-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 0;
+    }
+    .brand { font-weight: 800; letter-spacing: .3px; }
+    .brand span { color: var(--primary); }
+    .nav a {
+      color: var(--muted);
+      text-decoration: none;
+      margin-left: 16px;
+      font-size: 14px;
+    }
+    .nav a:hover { color: var(--text); }
+
+    .hero {
+      padding: 72px 0 38px;
+      display: grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 24px;
+      align-items: center;
+      animation: fadeUp .8s ease both;
+    }
+    .badge {
+      display: inline-block;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(56,189,248,.25);
+      background: rgba(56,189,248,.1);
+      color: #bae6fd;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 18px;
+    }
+    h1 {
+      margin: 0 0 14px;
+      font-size: clamp(36px, 6vw, 62px);
+      line-height: 1.04;
+      letter-spacing: -0.03em;
+    }
+    .lead {
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.8;
+      max-width: 690px;
+      margin-bottom: 24px;
+    }
+    .cta { display: flex; gap: 12px; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 14px 18px; border-radius: 14px; text-decoration: none; font-weight: 600;
+      transition: .22s ease;
+    }
+    .btn-primary { background: linear-gradient(135deg, var(--primary), var(--accent)); color: white; box-shadow: var(--shadow); }
+    .btn-secondary { background: rgba(255,255,255,.04); color: var(--text); border: 1px solid var(--line); }
+    .btn:hover { transform: translateY(-3px) scale(1.02); }
+
+    .hero-card, .card, .plan, .sample, .mini-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+    }
+    .hero-card {
+      padding: 22px;
+      animation: floatCard 6s ease-in-out infinite;
+    }
+    .hero-card h3 { margin-top: 0; }
+    .meta { display: grid; gap: 12px; margin-top: 16px; }
+    .meta-item {
+      display: flex; justify-content: space-between; gap: 12px;
+      color: var(--muted); font-size: 14px;
+      padding-bottom: 10px; border-bottom: 1px dashed rgba(255,255,255,.08);
+    }
+    .meta-item strong { color: var(--text); }
+
+    section { padding: 18px 0; }
+    .section-title {
+      margin: 0 0 12px;
+      font-size: 30px;
+      letter-spacing: -0.02em;
+    }
+    .section-desc { margin: 0 0 18px; color: var(--muted); line-height: 1.8; }
+
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .card {
+      padding: 22px;
+      transition: transform .28s ease, box-shadow .28s ease, border-color .28s ease;
+    }
+    .card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 50px rgba(0,0,0,.26);
+      border-color: rgba(56,189,248,.25);
+    }
+    .card h3 { margin-top: 0; margin-bottom: 10px; }
+    .card p, .card li { color: var(--muted); line-height: 1.8; }
+    .card ul { margin: 0; padding-left: 18px; }
+
+    .topic-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+    .mini-card { padding: 20px; transition: transform .24s ease, border-color .24s ease; }
+    .mini-card:hover { transform: translateY(-6px); border-color: rgba(139,92,246,.28); }
+    .mini-card h4 { margin: 0 0 10px; font-size: 18px; }
+    .mini-card p, .mini-card li { color: var(--muted); line-height: 1.8; }
+    .mini-card ul { margin: 0; padding-left: 18px; }
+
+    .pill-row { display: flex; flex-wrap: wrap; gap: 10px; }
+    .pill {
+      padding: 9px 13px; border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.08);
+      color: #dbeafe; font-size: 14px; font-weight: 500;
+    }
+
+    .plan-list { display: grid; gap: 16px; }
+    .plan { padding: 20px; }
+    .plan h3 { margin-top: 0; }
+    .plan p, .plan li { color: var(--muted); line-height: 1.8; }
+    .plan ul { margin: 0; padding-left: 18px; }
+
+    .sample-list { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .sample { padding: 22px; transition: transform .28s ease, border-color .28s ease; }
+    .sample:hover { transform: translateY(-8px); border-color: rgba(139,92,246,.28); }
+    .sample .tag {
+      display: inline-block; margin-bottom: 10px; font-size: 12px; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--success); font-weight: 700;
+    }
+    .sample h3 { margin: 0 0 10px; }
+    .sample p { margin: 0; color: var(--muted); line-height: 1.8; }
+
+    .reveal {
+      opacity: 0; transform: translateY(28px);
+      transition: opacity .7s ease, transform .7s ease;
+    }
+    .reveal.show { opacity: 1; transform: translateY(0); }
+
+    footer { color: var(--muted); text-align: center; padding: 16px 0 34px; font-size: 14px; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes floatCard {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    @keyframes floatGlow {
+      0%,100% { transform: translateY(0) translateX(0) scale(1); }
+      50% { transform: translateY(24px) translateX(12px) scale(1.08); }
+    }
+
+    @media (max-width: 960px) {
+      .hero, .grid, .topic-grid, .sample-list { grid-template-columns: 1fr; }
+      .nav-inner { flex-direction: column; align-items: flex-start; gap: 12px; }
+      .nav a { margin-left: 0; margin-right: 12px; display: inline-block; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="container nav-inner">
+      <div class="brand">VSTEP <span>B2</span> Study Hub</div>
+      <div>
+        <a href="#skills">4 kỹ năng</a>
+        <a href="#topics">Chủ đề</a>
+        <a href="#plan">Lộ trình</a>
+        <a href="#speaking">Speaking mẫu</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container">
+    <section class="hero">
+      <div>
+        <div class="badge">Ôn thi VSTEP B2 • Vocabulary • Speaking • Writing • Study Plan</div>
+        <h1>Trang học tiếng Anh để ôn thi VSTEP B2</h1>
+        <p class="lead">
+          Một nơi để bạn ôn nhanh theo đúng trọng tâm: từ vựng theo chủ đề, speaking mẫu, writing structure,
+          reading/listening strategy và lộ trình luyện thi gọn, dễ bám sát mục tiêu B2.
+        </p>
+        <div class="cta">
+          <a class="btn btn-primary" href="#topics">Bắt đầu ôn</a>
+          <a class="btn btn-secondary" href="#plan">Xem lộ trình 30 ngày</a>
+        </div>
+        <div class="pill-row" style="margin-top:16px;">
+          <span class="pill">Education</span>
+          <span class="pill">Technology</span>
+          <span class="pill">Work & Career</span>
+          <span class="pill">Environment</span>
+          <span class="pill">Health</span>
+          <span class="pill">Family</span>
+        </div>
+      </div>
+
+      <aside class="hero-card">
+        <h3 style="margin-top:0;">Checklist ôn nhanh</h3>
+        <div class="meta">
+          <div class="meta-item"><span>Từ vựng cần bám</span><strong>10 chủ đề lớn</strong></div>
+          <div class="meta-item"><span>Speaking nên luyện</span><strong>Part 1 • 2 • 3</strong></div>
+          <div class="meta-item"><span>Writing cần thuộc</span><strong>Email + Essay</strong></div>
+          <div class="meta-item"><span>Reading/Listening</span><strong>Keyword + paraphrase</strong></div>
+          <div class="meta-item"><span>Mục tiêu</span><strong>Đủ chắc để đạt B2</strong></div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="reveal" id="skills">
+      <h2 class="section-title">4 kỹ năng cần tập trung</h2>
+      <p class="section-desc">Muốn lên B2 nhanh, hãy ôn đúng trọng tâm của từng kỹ năng thay vì học lan man.</p>
+      <div class="grid">
+        <div class="card">
+          <h3>Reading</h3>
+          <ul>
+            <li>Tìm main idea và supporting idea</li>
+            <li>Nhận diện synonym / paraphrase</li>
+            <li>Đoán nghĩa từ ngữ cảnh</li>
+            <li>Luyện skim + scan để tiết kiệm thời gian</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Listening</h3>
+          <ul>
+            <li>Bắt keyword thay vì cố nghe từng từ</li>
+            <li>Nghe số, tên riêng, thời gian, địa điểm</li>
+            <li>Làm quen với cách diễn đạt lại ý</li>
+            <li>Luyện nghe đoạn hội thoại và thông báo ngắn</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Writing</h3>
+          <ul>
+            <li>Task 1: Email / Letter cơ bản</li>
+            <li>Task 2: Essay có mở-thân-kết rõ</li>
+            <li>Dùng linking words tự nhiên</li>
+            <li>Ưu tiên câu rõ ràng trước, hay sau</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="reveal">
+      <div class="grid">
+        <div class="card">
+          <h3>Speaking</h3>
+          <ul>
+            <li>Part 1: hỏi đáp đời thường</li>
+            <li>Part 2: đưa ra lựa chọn / giải pháp</li>
+            <li>Part 3: phát triển chủ đề xã hội</li>
+            <li>Chuẩn bị ideas + vocabulary trước theo topic</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Ngữ pháp nên chắc</h3>
+          <ul>
+            <li>Thì cơ bản + present perfect</li>
+            <li>Passive voice</li>
+            <li>Conditionals</li>
+            <li>Relative clauses</li>
+            <li>Comparison & modal verbs</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Chiến lược ôn</h3>
+          <ul>
+            <li>Mỗi topic: 20–30 từ vựng</li>
+            <li>5–10 collocations</li>
+            <li>2 bài speaking mẫu</li>
+            <li>1 đoạn writing ngắn để học lại</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="reveal" id="topics">
+      <h2 class="section-title">Các chủ đề VSTEP B2 quan trọng</h2>
+      <p class="section-desc">Đây là nhóm chủ đề rất hay xuất hiện ở cả speaking, writing, reading và listening.</p>
+      <div class="topic-grid">
+        <div class="mini-card">
+          <h4>Education</h4>
+          <ul>
+            <li>school life, online learning, exams, self-study</li>
+            <li>curriculum, assignment, qualification, academic pressure</li>
+          </ul>
+        </div>
+        <div class="mini-card">
+          <h4>Technology</h4>
+          <ul>
+            <li>social media, AI, internet, digital communication</li>
+            <li>privacy, distraction, convenience, efficiency</li>
+          </ul>
+        </div>
+        <div class="mini-card">
+          <h4>Work & Career</h4>
+          <ul>
+            <li>dream job, salary, promotion, work-life balance</li>
+            <li>responsibility, deadline, flexible schedule, teamwork</li>
+          </ul>
+        </div>
+        <div class="mini-card">
+          <h4>Environment</h4>
+          <ul>
+            <li>pollution, recycling, climate change</li>
+            <li>renewable energy, carbon emissions, natural resources</li>
+          </ul>
+        </div>
+        <div class="mini-card">
+          <h4>Health</h4>
+          <ul>
+            <li>healthy lifestyle, exercise, diet, stress</li>
+            <li>balanced diet, sedentary lifestyle, mental health</li>
+          </ul>
+        </div>
+        <div class="mini-card">
+          <h4>Family & Society</h4>
+          <ul>
+            <li>generation gap, parenting, friendship, social support</li>
+            <li>conflict, responsibility, mutual understanding</li>
+          </ul>
+        </div>
+        <div class="mini-card">
+          <h4>Travel</h4>
+          <ul>
+            <li>tourism, destinations, package tours, local culture</li>
+            <li>accommodation, itinerary, memorable experience</li>
+          </ul>
+        </div>
+        <div class="mini-card">
+          <h4>City Life & Transportation</h4>
+          <ul>
+            <li>traffic jam, public transport, urbanization</li>
+            <li>congestion, commute, cost of living, infrastructure</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="reveal" id="plan">
+      <h2 class="section-title">Lộ trình ôn thi gợi ý</h2>
+      <p class="section-desc">Nếu bạn chưa biết bắt đầu từ đâu, đây là cách đi an toàn và hiệu quả.</p>
+      <div class="plan-list">
+        <div class="plan">
+          <h3>Tuần 1 – Xây nền</h3>
+          <ul>
+            <li>Học 3 chủ đề: Education, Technology, Work</li>
+            <li>Mỗi ngày học 20 từ + 1 đoạn speaking ngắn</li>
+            <li>Ôn grammar: thì cơ bản, present perfect, passive voice</li>
+          </ul>
+        </div>
+        <div class="plan">
+          <h3>Tuần 2 – Tăng phản xạ</h3>
+          <ul>
+            <li>Học thêm Environment, Health, Family</li>
+            <li>Luyện speaking part 1 và part 3 theo topic</li>
+            <li>Viết email ngắn và essay 150–200 từ</li>
+          </ul>
+        </div>
+        <div class="plan">
+          <h3>Tuần 3 – Bám format đề</h3>
+          <ul>
+            <li>Làm đề reading/listening theo thời gian thật</li>
+            <li>Ôn các dạng essay: agree/disagree, advantages/disadvantages</li>
+            <li>Ghi âm speaking để sửa lỗi phát âm và độ trôi chảy</li>
+          </ul>
+        </div>
+        <div class="plan">
+          <h3>Tuần 4 – Ôn có trọng tâm</h3>
+          <ul>
+            <li>Ôn lại topic yếu nhất</li>
+            <li>Thuộc 10–15 opening sentence mẫu</li>
+            <li>Luyện đề tổng hợp và canh thời gian như thi thật</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="reveal" id="speaking">
+      <h2 class="section-title">Speaking mẫu để học theo</h2>
+      <p class="section-desc">Dưới đây là vài mẫu mở đầu. Nếu bạn muốn, mình có thể bổ sung đủ 20 bài speaking mẫu sau.</p>
+      <div class="sample-list">
+        <article class="sample">
+          <div class="tag">Speaking Topic</div>
+          <h3>Should students learn online?</h3>
+          <p>
+            In my opinion, online learning has both advantages and disadvantages. On the one hand, it is convenient and flexible because students can study anywhere. On the other hand, it may reduce face-to-face interaction and make some learners less focused. Overall, I think online learning is useful if students have strong self-discipline.
+          </p>
+        </article>
+        <article class="sample">
+          <div class="tag">Speaking Topic</div>
+          <h3>Why is technology important?</h3>
+          <p>
+            Technology plays an important role in modern life. It helps people work faster, communicate more easily and access information quickly. However, overusing technology can also cause problems such as distraction or privacy issues. Therefore, people should use technology in a smart and balanced way.
+          </p>
+        </article>
+        <article class="sample">
+          <div class="tag">Speaking Topic</div>
+          <h3>Do you prefer city life or country life?</h3>
+          <p>
+            Personally, I prefer city life because it offers more job opportunities, better public services and more entertainment options. However, I also think the countryside is more peaceful and less stressful. In the end, the best place depends on each person’s lifestyle and priorities.
+          </p>
+        </article>
+        <article class="sample">
+          <div class="tag">Speaking Topic</div>
+          <h3>How can people protect the environment?</h3>
+          <p>
+            There are several ways to protect the environment. First, people should reduce the use of plastic bags and recycle more. Second, using public transport can help reduce air pollution. Finally, raising awareness through education is also very important because long-term change starts from daily habits.
+          </p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    © 2026 • VSTEP B2 Study Hub • Làm cho Ngọc Tiến
+  </footer>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('show');
+      });
+    }, { threshold: 0.14 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>
