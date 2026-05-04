@@ -1,8 +1,0 @@
-{
-  "rewrites": [
-    {
-      "source": "/telegram-8722611614",
-      "destination": "/api/telegram-8722611614-page"
-    }
-  ]
-}
